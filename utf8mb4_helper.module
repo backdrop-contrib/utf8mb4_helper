@@ -111,7 +111,7 @@ function utf8mb4_helper_menu() {
     'title' => 'UTF8MB4 Helper',
     'description' => 'Configure UTF8MB4 Helper module',
     'page callback' => 'backdrop_get_form',
-    'page arguments' => array('utf8mb4_helper_settings'),
+    'page arguments' => array('utf8mb4_helper_settings_form'),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_NORMAL_ITEM,
   );
@@ -121,7 +121,7 @@ function utf8mb4_helper_menu() {
 /**
  * Custom settings form.
  */
-function utf8mb4_helper_settings() {
+function utf8mb4_helper_settings_form($form, &$form_state) {
   // After database conversion:
   if (state_get('database_utf8mb4_active', FALSE)) {
     $message = t('Your database seems to support utf-8 4-byte characters now, this module is obsolete and can get uninstalled.');
