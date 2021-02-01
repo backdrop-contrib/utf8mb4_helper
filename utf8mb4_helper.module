@@ -38,6 +38,7 @@ function _utf8mb4_helper_element_validate($element, &$form_state, $form) {
           'showmessage' => FALSE,
         );
       }
+      $title = isset($element['#title']) ? $element['#title'] : $element['#name'];
 
       if ($config['strategy'] == 'replace') {
         $sanitised = _utf8mb4_helper_values_replace($submitted_value);
@@ -45,14 +46,14 @@ function _utf8mb4_helper_element_validate($element, &$form_state, $form) {
 
         if ($sanitised != $submitted_value && $config['showmessage']) {
           $message = t('Problematic character(s) like emojis got replaced in field %field.', array(
-            '%field' => $element['#title'],
+            '%field' => $title,
           ));
           backdrop_set_message($message, 'info');
         }
       }
       elseif (_utf8mb4_helper_values_indicate($submitted_value)) {
         $message = t('Field %field contains problematic characters like emojis. Remove them to submit the form.', array(
-          '%field' => $element['#title'],
+          '%field' => $title,
         ));
         form_set_error($element['#name'], $message);
       }
