@@ -1,0 +1,6 @@
+{
+    "_config_name": "utf8mb4_helper.settings",
+    "strategy": "indicate",
+    "replacecharacter": "-",
+    "showmessage": false
+}
