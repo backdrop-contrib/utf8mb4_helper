@@ -125,7 +125,7 @@ function utf8mb4_helper_settings_form($form, &$form_state) {
   // After database conversion:
   if (state_get('database_utf8mb4_active', FALSE)) {
     $message = t('Your database seems to support utf-8 4-byte characters now, this module is obsolete and can get uninstalled.');
-    backdrop_set_message($message, 'info');
+    backdrop_set_message($message, 'info', FALSE);
   }
 
   $form = array();
