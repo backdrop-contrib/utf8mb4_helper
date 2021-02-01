@@ -62,6 +62,12 @@ function _utf8mb4_helper_element_validate($element, &$form_state, $form) {
 
 /**
  * Custom callback to check if a string contains probematic characters.
+ *
+ * @param string $value
+ *   User provided value to check.
+ *
+ * @return bool
+ *   Whether the string contains 4-byte characters or not.
  */
 function _utf8mb4_helper_values_indicate($value) {
   $result = preg_match(UTF8MB4_HELPER_REGEX, $value, $matches);
@@ -72,7 +78,13 @@ function _utf8mb4_helper_values_indicate($value) {
 }
 
 /**
- * Custom callback to replace with unproblematic characters.
+ * Custom callback to replace 4-byte with unproblematic characters.
+ *
+ * @param string $value
+ *   User provided value to check.
+ *
+ * @return string
+ *   Sanitized string.
  */
 function _utf8mb4_helper_values_replace($value) {
   $replace_with = config_get('utf8mb4_helper.settings', 'replacecharacter');
