@@ -145,7 +145,6 @@ function utf8mb4_helper_settings_form($form, &$form_state) {
       'indicate' => 'Prevent form submission',
       'replace' => 'Replace problematic values on submission',
     ),
-    '#description' => t('Whether the values should be rejected or silently replaced.'),
   );
 
   $options = array(
