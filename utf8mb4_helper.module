@@ -122,6 +122,12 @@ function utf8mb4_helper_menu() {
  * Custom settings form.
  */
 function utf8mb4_helper_settings() {
+  // After database conversion:
+  if (state_get('database_utf8mb4_active', FALSE)) {
+    $message = t('Your database seems to support utf-8 4-byte characters now, this module is obsolete and can get uninstalled.');
+    backdrop_set_message($message, 'info');
+  }
+
   $form = array();
   $form['#config'] = 'utf8mb4_helper.settings';
   $config = config_get('utf8mb4_helper.settings');
