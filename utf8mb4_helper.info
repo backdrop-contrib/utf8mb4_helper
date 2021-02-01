@@ -1,0 +1,4 @@
+name = "UTF8MB4 Helper"
+description = "Prevent exceptions when the database is incompatible with 4-byte characters."
+backdrop = 1.x
+type = module
