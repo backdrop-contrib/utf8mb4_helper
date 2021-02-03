@@ -28,16 +28,24 @@ function utf8mb4_helper_element_info_alter(&$type) {
  */
 function _utf8mb4_helper_element_validate($element, &$form_state, $form) {
   if (!empty($form_state['values'])) {
+    $config = config_get('utf8mb4_helper.settings');
+    if ($config == NULL) {
+      $config = array(
+        'strategy' => 'indicate',
+        'showmessage' => FALSE,
+        'allowlist' => '',
+      );
+    }
+
+    // Consider allow list settings for the current form.
+    $skip = _utf8mb4_helper_skip_form_id($form['#form_id'], $config);
+    if ($skip) {
+      return;
+    }
+
     $parents = $element['#parents'];
     $submitted_value = backdrop_array_get_nested_value($form_state['values'], $parents);
     if ($submitted_value !== '') {
-      $config = config_get('utf8mb4_helper.settings');
-      if ($config == NULL) {
-        $config = array(
-          'strategy' => 'indicate',
-          'showmessage' => FALSE,
-        );
-      }
       $title = isset($element['#title']) ? $element['#title'] : $element['#name'];
 
       if ($config['strategy'] == 'replace') {
@@ -93,6 +101,43 @@ function _utf8mb4_helper_values_replace($value) {
   $replace_with = config_get('utf8mb4_helper.settings', 'replacecharacter');
   $processed = preg_replace(UTF8MB4_HELPER_REGEX, $replace_with, $value);
   return $processed;
+}
+
+/**
+ * Helper function to check, if a form should skip 4-byte validation.
+ *
+ * @param string $form_id
+ *   The id of the current form.
+ * @param array $config
+ *   Config options from module settings.
+ *
+ * @return bool
+ *   Whether to skip validation for this form or not.
+ */
+function _utf8mb4_helper_skip_form_id($form_id, array $config) {
+  $skip = &backdrop_static(__FUNCTION__);
+
+  if (!isset($skip)) {
+    $skip = FALSE;
+    if (empty($config['allowlist'])) {
+      return $skip;
+    }
+
+    $allowlist = explode("\n", $config['allowlist']);
+    foreach ($allowlist as $item) {
+      $item = trim($item);
+      if ($item == '') {
+        continue;
+      }
+      $pattern = '/' . str_replace('*', '.*', $item) . '/';
+      if (preg_match($pattern, $form_id) > 0) {
+        $skip = TRUE;
+        break;
+      }
+    }
+  }
+
+  return $skip;
 }
 
 /**
@@ -178,5 +223,16 @@ function utf8mb4_helper_settings_form($form, &$form_state) {
     ),
   );
 
+  $description = t('Enter one form ID per line, the "*" character is a wildcard. Examples: !example1 or !example2.', array(
+    '!example1' => '<code>views_exposed_form</code>',
+    '!example2' => '<code>your_custom_*_form</code>',
+  ));
+  $description .= '<br />' . t('Validation for 4-byte characters will be skipped on these forms, so make sure that the form does not save text values to the database.');
+  $form['settings']['allowlist'] = array(
+    '#type' => 'textarea',
+    '#title' => 'Form ID allow list',
+    '#description' => $description,
+    '#default_value' => isset($config['allowlist']) ? $config['allowlist'] : '',
+  );
   return system_settings_form($form);
 }
