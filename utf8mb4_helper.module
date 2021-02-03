@@ -51,9 +51,10 @@ function _utf8mb4_helper_element_validate($element, &$form_state, $form) {
           backdrop_set_message($message, 'info');
         }
       }
-      elseif (_utf8mb4_helper_values_indicate($submitted_value)) {
-        $message = t('Field %field contains problematic characters like emojis. Remove them to submit the form.', array(
+      elseif ($chars = _utf8mb4_helper_values_indicate($submitted_value)) {
+        $message = t('Field %field contains these unsupported characters: @chars. Please remove them to submit the form.', array(
           '%field' => $title,
+          '@chars' => $chars,
         ));
         form_set_error($element['#name'], $message);
       }
@@ -67,13 +68,14 @@ function _utf8mb4_helper_element_validate($element, &$form_state, $form) {
  * @param string $value
  *   User provided value to check.
  *
- * @return bool
- *   Whether the string contains 4-byte characters or not.
+ * @return string|bool
+ *   If the string contains 4-byte characters, the extracted characters
+ *   combined to a single string, FALSE otherwise.
  */
 function _utf8mb4_helper_values_indicate($value) {
-  $result = preg_match(UTF8MB4_HELPER_REGEX, $value, $matches);
+  $result = preg_match_all(UTF8MB4_HELPER_REGEX, $value, $matches);
   if ($result > 0) {
-    return TRUE;
+    return implode(" ", array_unique($matches[0]));
   }
   return FALSE;
 }
