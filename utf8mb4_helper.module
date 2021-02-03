@@ -60,10 +60,13 @@ function _utf8mb4_helper_element_validate($element, &$form_state, $form) {
         }
       }
       elseif ($chars = _utf8mb4_helper_values_indicate($submitted_value)) {
-        $message = t('Field %field contains these unsupported characters: @chars. Please remove them to submit the form.', array(
-          '%field' => $title,
-          '@chars' => $chars,
-        ));
+        $string = implode(" ", $chars);
+        $message = format_plural(count($chars),
+          'Field %field contains 1 unsupported character: @string. Please remove it to submit the form.',
+          'Field %field contains @count unsupported characters: @string. Please remove them to submit the form.', array(
+            '%field' => $title,
+            '@string' => $string,
+          ));
         form_set_error($element['#name'], $message);
       }
     }
@@ -76,14 +79,14 @@ function _utf8mb4_helper_element_validate($element, &$form_state, $form) {
  * @param string $value
  *   User provided value to check.
  *
- * @return string|bool
+ * @return array|bool
  *   If the string contains 4-byte characters, the extracted characters
- *   combined to a single string, FALSE otherwise.
+ *   as an array, FALSE otherwise.
  */
 function _utf8mb4_helper_values_indicate($value) {
   $result = preg_match_all(UTF8MB4_HELPER_REGEX, $value, $matches);
   if ($result > 0) {
-    return implode(" ", array_unique($matches[0]));
+    return $matches[0];
   }
   return FALSE;
 }
