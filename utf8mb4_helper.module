@@ -74,7 +74,7 @@ function _utf8mb4_helper_element_validate($element, &$form_state, $form) {
 }
 
 /**
- * Custom callback to check if a string contains probematic characters.
+ * Custom callback to check if a string contains problematic characters.
  *
  * @param string $value
  *   User provided value to check.
@@ -84,6 +84,11 @@ function _utf8mb4_helper_element_validate($element, &$form_state, $form) {
  *   as an array, FALSE otherwise.
  */
 function _utf8mb4_helper_values_indicate($value) {
+  // In some cases (list field, rules...) the value can be an array. There's
+  // nothing we can do with it, return early to prevent PHP warnings.
+  if (!is_string($value)) {
+    return FALSE;
+  }
   $result = preg_match_all(UTF8MB4_HELPER_REGEX, $value, $matches);
   if ($result > 0) {
     return $matches[0];
